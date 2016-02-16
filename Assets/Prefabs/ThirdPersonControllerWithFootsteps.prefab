@@ -2418,10 +2418,10 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 24313340, guid: 6aae0d4b86f9cd246958566e9c1e1a3c,
     type: 2}
   m_audioClip: {fileID: 0}
-  m_PlayOnAwake: 1
+  m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
-  Loop: 1
+  Loop: 0
   Mute: 0
   Spatialize: 0
   Priority: 128
