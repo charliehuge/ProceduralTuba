@@ -39,14 +39,14 @@ namespace DerelictComputer
                 {
                     _animator.SetTrigger("Hop");
                     _lastStep = Time.time;
-                    _melodyGenerator.TriggerFootstep();
+                    _melodyGenerator.TriggerFootstep(true);
                 }
                 else if (!hopping && Time.time > _lastStep + _stepInterval)
                 {
                     _animator.SetTrigger(_lastStepWasLeft ? "StepRight" : "StepLeft");
                     _lastStepWasLeft = !_lastStepWasLeft;
                     _lastStep = Time.time;
-                    _melodyGenerator.TriggerFootstep();
+                    _melodyGenerator.TriggerFootstep(false);
                 }
 
                 Vector3 camForward = Vector3.Scale(_camTransform.forward, new Vector3(1, 0, 1)).normalized;

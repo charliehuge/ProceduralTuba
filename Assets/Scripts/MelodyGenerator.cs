@@ -16,6 +16,7 @@ namespace DerelictComputer
         private double _latency = 0.1;
         private double _nextTickTime;
         private double _lastFootstepTime;
+        private bool _isRunning;
 
         public void Reset()
         {
@@ -25,8 +26,10 @@ namespace DerelictComputer
             Key = (int) (Random.value*12);
         }
 
-        public void TriggerFootstep()
+        public void TriggerFootstep(bool isRunning)
         {
+            _isRunning = isRunning;
+
             if (_lastFootstepTime > 0)
             {
                 // basically tap tempo with footsteps
@@ -35,7 +38,14 @@ namespace DerelictComputer
                 // filter out anything lower than our latency, because that probably means it's erroneous
                 if (newInterval > _latency)
                 {
-                    _interval = (AudioSettings.dspTime - _lastFootstepTime) / 3;
+                    if (_isRunning)
+                    {
+                        _interval = (AudioSettings.dspTime - _lastFootstepTime)/2;
+                    }
+                    else
+                    {
+                        _interval = (AudioSettings.dspTime - _lastFootstepTime)/3;
+                    }
                     Debug.Log(_interval);
 
                     if (!_playing)
@@ -72,58 +82,97 @@ namespace DerelictComputer
                     _tuba.PlayNote(SelectNote(), _nextTickTime, SelectDuration());
                 }
                 _nextTickTime += _interval;
-                _currentTick = (_currentTick + 1)%6;
+                _currentTick = (_currentTick + 1)%(_isRunning ? 8 : 6);
             }
         }
 
         private bool SelectShouldPlayNote()
         {
-            if (_currentTick == 0 || _currentTick == 3)
+            if (_isRunning)
             {
-                return true;
-            }
+                if (_currentTick == 0 || _currentTick == 4)
+                {
+                    return true;
+                }
 
-            if (_currentTick == 2)
-            {
-                return Random.value < 0.75f;
-            }
+                if (_currentTick == 2 || _currentTick == 6)
+                {
+                    return Random.value < 0.85f;
+                }
 
-            if (_currentTick == 5)
-            {
-                return Random.value < 0.5f;
+                return Random.value < 0.25f;
             }
-            
-            return Random.value < 0.1f;
+            else
+            {
+                if (_currentTick == 0 || _currentTick == 3)
+                {
+                    return true;
+                }
+
+                if (_currentTick == 2)
+                {
+                    return Random.value < 0.75f;
+                }
+
+                if (_currentTick == 5)
+                {
+                    return Random.value < 0.5f;
+                }
+
+                return Random.value < 0.1f;
+            }
         }
 
         private int SelectNote()
         {
-            if (_currentTick == 0)
+            if (_isRunning)
             {
-                return Key + RootNote + (Random.value < 0.5 ? 12 : (Random.value < 0.75 ? 0 : 24));
-            }
+                if (_currentTick == 0 || _currentTick == 4)
+                {
+                    return Key + RootNote + (Random.value < 0.5 ? 12 : (Random.value < 0.75 ? 0 : 24));
+                }
 
-            if (_currentTick == 3)
-            {
-                return Key + RootNote + (Random.value < 0.5 ? 7 : 17);
-            }
+                if (_currentTick == 2 || _currentTick == 6)
+                {
+                    return Key + RootNote + (Random.value < 0.5 ? 7 : 19);
+                }
 
-            if (_currentTick == 2)
-            {
-                return Key + RootNote + 16;
-            }
+                if (_currentTick == 1 || _currentTick == 5)
+                {
+                    return Key + RootNote + (Random.value < 0.5 ? 9 : 16);
+                }
 
-            if (_currentTick == 4)
-            {
-                return Key + RootNote + (Random.value < 0.5 ? 9 : 16);
-            }
-
-            if (_currentTick == 5)
-            {
                 return Key + RootNote + (Random.value < 0.5 ? 11 : 14);
             }
+            else
+            {
+                if (_currentTick == 0)
+                {
+                    return Key + RootNote + (Random.value < 0.5 ? 12 : (Random.value < 0.75 ? 0 : 24));
+                }
 
-            return Key + RootNote + (Random.value < 0.5 ? 11 : 14);
+                if (_currentTick == 3)
+                {
+                    return Key + RootNote + (Random.value < 0.5 ? 7 : 17);
+                }
+
+                if (_currentTick == 2)
+                {
+                    return Key + RootNote + 16;
+                }
+
+                if (_currentTick == 4)
+                {
+                    return Key + RootNote + (Random.value < 0.5 ? 9 : 16);
+                }
+
+                if (_currentTick == 5)
+                {
+                    return Key + RootNote + (Random.value < 0.5 ? 11 : 14);
+                }
+
+                return Key + RootNote + (Random.value < 0.5 ? 11 : 14);
+            }
         }
 
         private double SelectDuration()
